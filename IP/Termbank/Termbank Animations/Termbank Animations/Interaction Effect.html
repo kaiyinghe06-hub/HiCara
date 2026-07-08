@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>S23_Interaction_animation: 交互作用 Interaction Effect</title>
+    <style>
+        :root {
+            /* Okabe-Ito Colorblind-safe Palette */
+            --c-orange: #E69F00;
+            --c-blue: #56B4E9;
+            --c-green: #009E73;
+            --c-navy: #0072B2;
+            --c-red: #D55E00;
+            --c-bg: #f8f9fa;
+            --c-border: #ddd;
+            --c-text: #333;
+            --c-text-muted: #666;
+            
+            font-family: system-ui, "PingFang SC", Arial, sans-serif;
+            font-size: 15px;
+            color: var(--c-text);
+        }
+
+        * { box-sizing: border-box; }
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f2f5;
+        }
+
+        h1, h2, h3 { margin-top: 0; }
+        
+        .container {
+            max-width: 1100px;
+            margin: 0 auto;
+            min-width: 960px; /* Minimum width requirement */
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* Term Card */
+        .term-card {
+            background: white;
+            border: 1px solid var(--c-border);
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .term-card summary {
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            outline: none;
+            color: var(--c-navy);
+        }
+        .term-card table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.95rem;
+        }
+        .term-card th, .term-card td {
+            border: 1px solid var(--c-border);
+            padding: 10px;
+            text-align: left;
+            vertical-align: top;
+        }
+        .term-card th {
+            background: var(--c-bg);
+            width: 15%;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+
+        /* Layout Grid */
+        .grid {
+            display: grid;
+            grid-template-columns: 55% 43%;
+            gap: 2%;
+        }
+        .right-column {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .panel {
+            background: white;
+            border: 1px solid var(--c-border);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* Panel A: Interaction Plot */
+        .panel-a-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .badge-none { background-color: #888; }
+        .badge-ordinal { background-color: var(--c-orange); }
+        .badge-disordinal { background-color: var(--c-red); }
+
+        .plot-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .svg-wrapper {
+            position: relative;
+            width: 100%;
+            border: 1px solid var(--c-border);
+            border-radius: 6px;
+            background: #fff;
+        }
+        
+        svg {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        /* CSS-only Tooltips */
+        .css-tooltip {
+            position: absolute;
+            width: 24px;
+            height: 24px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            cursor: crosshair;
+            z-index: 10;
+        }
+        .css-tooltip::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: 100%;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0, 0, 0, 0.85);
+            color: white;
+            padding: 6px 10px;
+            border-radius: 4px;
+            white-space: nowrap;
+            font-size: 13px;
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 0.2s;
+            margin-bottom: 5px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            z-index: 100;
+        }
+        .css-tooltip:hover::after {
+            opacity: 1;
+        }
+
+        /* Sliders */
+        .controls-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            background: var(--c-bg);
+            padding: 15px;
+            border-radius: 6px;
+        }
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            font-size: 14px;
+        }
+        .slider-group label {
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .slider-group span.val {
+            font-family: monospace;
+            font-size: 15px;
+            color: var(--c-navy);
+        }
+        input[type="range"] {
+            width: 100%;
+            cursor: pointer;
+        }
+        .slider-l1 input { accent-color: var(--c-blue); }
+        .slider-l2 input { accent-color: var(--c-orange); }
+
+        /* Panel B: Effect Decomposition */
+        .formula-box {
+            background: var(--c-bg);
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .coding-note {
+            font-size: 12px;
+            color: var(--c-text-muted);
+            margin-bottom: 10px;
+        }
+        .equation {
+            font-size: 16px;
+            text-align: center;
+            font-family: monospace;
+            background: white;
+            padding: 12px;
+            border: 1px solid var(--c-border);
+            border-radius: 4px;
+        }
+        .equation span { font-weight: bold; }
+
+        .effect-bar-container {
+            margin-top: 10px;
+        }
+        .effect-bar-wrapper {
+            display: flex;
+            height: 32px;
+            border-radius: 6px;
+            overflow: hidden;
+            background: #eee;
+        }
+        .effect-bar {
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 13px;
+            font-weight: bold;
+            transition: width 0.4s ease;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+        .legend-grid {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 10px;
+            font-size: 13px;
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+        .linguistic-meaning {
+            margin-top: 20px;
+            font-size: 13.5px;
+            line-height: 1.6;
+            color: var(--c-text-muted);
+        }
+        .linguistic-meaning p { margin: 5px 0; }
+        .linguistic-meaning strong { color: var(--c-text); }
+
+        /* Panel C: Preset Scenarios */
+        .preset-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .preset-btn {
+            background: white;
+            border: 2px solid var(--c-border);
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--c-text);
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .preset-btn:hover {
+            border-color: var(--c-navy);
+            background: var(--c-bg);
+        }
+
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #888;
+            font-size: 13px;
+            padding: 20px 0;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>交互作用 Interaction Effect</h1>
+        </header>
+
+        <!-- 术语卡片 Term Card -->
+        <details class="term-card">
+            <summary>📋 术语卡片 Term Card (点击展开 / Click to Expand)</summary>
+            <table>
+                <tbody>
+                    <tr><th>编号 ID</th><td>S23</td></tr>
+                    <tr><th>中文名称</th><td>交互作用</td></tr>
+                    <tr><th>英文名称</th><td>Interaction Effect</td></tr>
+                    <tr><th>拼音</th><td>jiāo hù zuò yòng</td></tr>
+                    <tr><th>公式</th><td><i>Y = β<sub>0</sub> + β<sub>1</sub>X<sub>1</sub> + β<sub>2</sub>X<sub>2</sub> + β<sub>12</sub>(X<sub>1</sub>X<sub>2</sub>) + ε</i></td></tr>
+                    <tr><th>中文定义</th><td>当一个自变量对因变量的影响随着另一个自变量的水平变化而发生改变时，称这两个自变量之间存在交互作用。</td></tr>
+                    <tr><th>英文定义</th><td>An interaction occurs when the effect of one independent variable on the dependent variable differs depending on the level of another independent variable.</td></tr>
+                    <tr><th>语言学例句</th><td>研究发现词频与语言水平之间存在显著的交互作用：低频词对二语学习者阅读时间的增加幅度显著大于母语者。</td></tr>
+                </tbody>
+            </table>
+        </details>
+
+        <div class="grid">
+            <!-- Panel A: Interaction Plot -->
+            <div class="panel panel-a">
+                <div class="panel-a-header">
+                    <h2>Panel A: 交互图 Interaction Plot</h2>
+                    <span id="interaction-badge" class="badge badge-none">检测中...</span>
+                </div>
+                
+                <div class="plot-container">
+                    <div class="svg-wrapper">
+                        <!-- viewBox standardizes internal coordinate system to 500x400 -->
+                        <svg viewBox="0 0 500 400" preserveAspectRatio="xMidYMid meet" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Y-axis Grid -->
+                            <g stroke="#eee" stroke-width="1">
+                                <line x1="60" y1="340" x2="480" y2="340"/> <!-- 100 -->
+                                <line x1="60" y1="290" x2="480" y2="290"/> <!-- 200 -->
+                                <line x1="60" y1="240" x2="480" y2="240"/> <!-- 300 -->
+                                <line x1="60" y1="190" x2="480" y2="190"/> <!-- 400 -->
+                                <line x1="60" y1="140" x2="480" y2="140"/> <!-- 500 -->
+                                <line x1="60" y1="90" x2="480" y2="90"/>   <!-- 600 -->
+                                <line x1="60" y1="40" x2="480" y2="40"/>   <!-- 700 -->
+                            </g>
+                            <!-- Y-axis Labels -->
+                            <g fill="#888" font-size="12" text-anchor="end">
+                                <text x="50" y="344">100</text>
+                                <text x="50" y="294">200</text>
+                                <text x="50" y="244">300</text>
+                                <text x="50" y="194">400</text>
+                                <text x="50" y="144">500</text>
+                                <text x="50" y="94">600</text>
+                                <text x="50" y="44">700</text>
+                            </g>
+                            <!-- Y-axis Title -->
+                            <text x="-200" y="15" transform="rotate(-90)" fill="#333" font-size="14" font-weight="bold">阅读时间 Reading Time (ms)</text>
+
+                            <!-- X-axis -->
+                            <line x1="60" y1="340" x2="480" y2="340" stroke="#aaa" stroke-width="2"/>
+                            <line x1="150" y1="340" x2="150" y2="346" stroke="#aaa" stroke-width="2"/>
+                            <line x1="350" y1="340" x2="350" y2="346" stroke="#aaa" stroke-width="2"/>
+                            
+                            <!-- X-axis Labels -->
+                            <text x="150" y="365" fill="#333" font-size="14" text-anchor="middle">高频 High Freq</text>
+                            <text x="350" y="365" fill="#333" font-size="14" text-anchor="middle">低频 Low Freq</text>
+
+                            <!-- Data Lines -->
+                            <line id="line-l1" x1="150" y1="0" x2="350" y2="0" stroke="#56B4E9" stroke-width="3"/>
+                            <line id="line-l2" x1="150" y1="0" x2="350" y2="0" stroke="#E69F00" stroke-width="3" stroke-dasharray="6 4"/>
+
+                            <!-- Data Points (Circles) -->
+                            <circle id="pt-l1-high" cx="150" cy="0" r="6" fill="#56B4E9"/>
+                            <circle id="pt-l1-low" cx="350" cy="0" r="6" fill="#56B4E9"/>
+                            <circle id="pt-l2-high" cx="150" cy="0" r="6" fill="#E69F00"/>
+                            <circle id="pt-l2-low" cx="350" cy="0" r="6" fill="#E69F00"/>
+
+                            <!-- Plot Legend -->
+                            <rect x="360" y="40" width="110" height="60" fill="#fff" stroke="#ddd" rx="4"/>
+                            <line x1="370" y1="55" x2="390" y2="55" stroke="#56B4E9" stroke-width="3"/>
+                            <circle cx="380" cy="55" r="4" fill="#56B4E9"/>
+                            <text x="400" y="59" fill="#333" font-size="12">母语者 L1</text>
+
+                            <line x1="370" y1="80" x2="390" y2="80" stroke="#E69F00" stroke-width="3" stroke-dasharray="6 4"/>
+                            <circle cx="380" cy="80" r="4" fill="#E69F00"/>
+                            <text x="400" y="84" fill="#333" font-size="12">学习者 L2</text>
+                        </svg>
+
+                        <!-- CSS Tooltip Overlays (Absolute positioned matching SVG data points) -->
+                        <div id="tt-l1-high" class="css-tooltip" data-tooltip=""></div>
+                        <div id="tt-l1-low" class="css-tooltip" data-tooltip=""></div>
+                        <div id="tt-l2-high" class="css-tooltip" data-tooltip=""></div>
+                        <div id="tt-l2-low" class="css-tooltip" data-tooltip=""></div>
+                    </div>
+
+                    <div class="controls-grid">
+                        <div class="slider-group slider-l1">
+                            <label>L1 × 高频 High Freq: <span id="val-l1-high" class="val">250</span> ms</label>
+                            <input type="range" id="l1-high" min="150" max="600" value="250">
+                        </div>
+                        <div class="slider-group slider-l1">
+                            <label>L1 × 低频 Low Freq: <span id="val-l1-low" class="val">350</span> ms</label>
+                            <input type="range" id="l1-low" min="150" max="600" value="350">
+                        </div>
+                        <div class="slider-group slider-l2">
+                            <label>L2 × 高频 High Freq: <span id="val-l2-high" class="val">350</span> ms</label>
+                            <input type="range" id="l2-high" min="150" max="600" value="350">
+                        </div>
+                        <div class="slider-group slider-l2">
+                            <label>L2 × 低频 Low Freq: <span id="val-l2-low" class="val">550</span> ms</label>
+                            <input type="range" id="l2-low" min="150" max="600" value="550">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="right-column">
+                <!-- Panel B: Effect Decomposition -->
+                <div class="panel panel-b">
+                    <h2>Panel B: 效应量分解 Effect Decomposition</h2>
+                    <div class="formula-box">
+                        <div class="coding-note">
+                            *编码方式 Coding: 频率 Frequency (高频=0, 低频=1); 水平 Proficiency (L1=0, L2=1)
+                        </div>
+                        <div class="equation">
+                            y = <span id="eq-b0" style="color:#333;">250</span> 
+                            <span id="eq-b1" style="color:#009E73;">+100</span>·Freq 
+                            <span id="eq-b2" style="color:#0072B2;">+100</span>·Prof 
+                            <span id="eq-b12" style="color:#D55E00;">+100</span>·(Freq×Prof)
+                        </div>
+                    </div>
+
+                    <div class="effect-bar-container">
+                        <strong>效应量绝对值占比 Proportion of Absolute Effects:</strong>
+                        <div class="effect-bar-wrapper">
+                            <div id="bar-b1" class="effect-bar" style="background:#009E73; width:33.3%;"></div>
+                            <div id="bar-b2" class="effect-bar" style="background:#0072B2; width:33.3%;"></div>
+                            <div id="bar-b12" class="effect-bar" style="background:#D55E00; width:33.4%;"></div>
+                        </div>
+                        <div class="legend-grid">
+                            <div class="legend-item"><div class="legend-color" style="background:#009E73;"></div> 词频主效应 Freq (|β₁|)</div>
+                            <div class="legend-item"><div class="legend-color" style="background:#0072B2;"></div> 水平主效应 Prof (|β₂|)</div>
+                            <div class="legend-item"><div class="legend-color" style="background:#D55E00;"></div> 交互作用 Interaction (|β₁₂|)</div>
+                        </div>
+                    </div>
+
+                    <div class="linguistic-meaning">
+                        <p><strong>β₁ (词频):</strong> 低频词相对于高频词，增加的阅读时间</p>
+                        <p><strong>β₂ (水平):</strong> L2学习者相对于母语者，增加的阅读时间</p>
+                        <p><strong>β₁₂ (交互):</strong> 低频对L2学习者的影响，比对母语者的影响多出多少</p>
+                    </div>
+                </div>
+
+                <!-- Panel C: Preset Scenarios -->
+                <div class="panel panel-c">
+                    <h2>Panel C: 预设场景 Preset Scenarios</h2>
+                    <div class="preset-grid">
+                        <button class="preset-btn" id="btn-preset-1">无交互 No Interaction<br><small>(Parallel Lines)</small></button>
+                        <button class="preset-btn" id="btn-preset-2">顺序交互 Ordinal Interaction<br><small>(Lines Diverge)</small></button>
+                        <button class="preset-btn" id="btn-preset-3">零序交互 Disordinal Interaction<br><small>(Lines Cross)</small></button>
+                        <button class="preset-btn" id="btn-preset-4">真实数据近似 Real-data Approx<br><small>(L2 affected heavily)</small></button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            语料库统计术语动画 v1.0 | 2026-04 | 语言学研究用途 | Linguistics Research Visualization
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            // Slider elements
+            const inputs = {
+                l1_high: document.getElementById('l1-high'),
+                l1_low: document.getElementById('l1-low'),
+                l2_high: document.getElementById('l2-high'),
+                l2_low: document.getElementById('l2-low')
+            };
+
+            // Value readouts
+            const vals = {
+                l1_high: document.getElementById('val-l1-high'),
+                l1_low: document.getElementById('val-l1-low'),
+                l2_high: document.getElementById('val-l2-high'),
+                l2_low: document.getElementById('val-l2-low')
+            };
+
+            // SVG elements
+            const svgElements = {
+                line_l1: document.getElementById('line-l1'),
+                line_l2: document.getElementById('line-l2'),
+                pt_l1_high: document.getElementById('pt-l1-high'),
+                pt_l1_low: document.getElementById('pt-l1-low'),
+                pt_l2_high: document.getElementById('pt-l2-high'),
+                pt_l2_low: document.getElementById('pt-l2-low')
+            };
+
+            // Tooltips
+            const tooltips = {
+                l1_high: document.getElementById('tt-l1-high'),
+                l1_low: document.getElementById('tt-l1-low'),
+                l2_high: document.getElementById('tt-l2-high'),
+                l2_low: document.getElementById('tt-l2-low')
+            };
+
+            // X-coordinates in SVG space
+            const X_HIGH = 150;
+            const X_LOW = 350;
+
+            // Mathematical mapping for Y-axis (Range: 100 to 700 -> Pixel: 340 to 40)
+            // Range = 600ms. Pixel height = 300px.
+            const mapY = (val) => 340 - ((val - 100) / 600) * 300;
+
+            // Format formula coefficient to include sign
+            const formatBeta = (b) => b >= 0 ? `+${b}` : `${b}`;
+
+            function updatePlot() {
+                // 1. Get current values
+                const v_l1h = parseInt(inputs.l1_high.value);
+                const v_l1l = parseInt(inputs.l1_low.value);
+                const v_l2h = parseInt(inputs.l2_high.value);
+                const v_l2l = parseInt(inputs.l2_low.value);
+
+                // 2. Update readouts
+                vals.l1_high.textContent = v_l1h;
+                vals.l1_low.textContent = v_l1l;
+                vals.l2_high.textContent = v_l2h;
+                vals.l2_low.textContent = v_l2l;
+
+                // 3. Update SVG coordinates
+                const y_l1h = mapY(v_l1h);
+                const y_l1l = mapY(v_l1l);
+                const y_l2h = mapY(v_l2h);
+                const y_l2l = mapY(v_l2l);
+
+                svgElements.line_l1.setAttribute('y1', y_l1h);
+                svgElements.line_l1.setAttribute('y2', y_l1l);
+                svgElements.line_l2.setAttribute('y1', y_l2h);
+                svgElements.line_l2.setAttribute('y2', y_l2l);
+
+                svgElements.pt_l1_high.setAttribute('cy', y_l1h);
+                svgElements.pt_l1_low.setAttribute('cy', y_l1l);
+                svgElements.pt_l2_high.setAttribute('cy', y_l2h);
+                svgElements.pt_l2_low.setAttribute('cy', y_l2l);
+
+                // 4. Update CSS Tooltip overlays (match SVG percentages)
+                // X% = (X / 500) * 100, Y% = (Y / 400) * 100
+                const pos = (el, x, y, label, val) => {
+                    el.style.left = `${(x / 500) * 100}%`;
+                    el.style.top = `${(y / 400) * 100}%`;
+                    el.setAttribute('data-tooltip', `${label}: ${val} ms`);
+                };
+                pos(tooltips.l1_high, X_HIGH, y_l1h, "被试 L1, 词频 高频", v_l1h);
+                pos(tooltips.l1_low, X_LOW, y_l1l, "被试 L1, 词频 低频", v_l1l);
+                pos(tooltips.l2_high, X_HIGH, y_l2h, "被试 L2, 词频 高频", v_l2h);
+                pos(tooltips.l2_low, X_LOW, y_l2l, "被试 L2, 词频 低频", v_l2l);
+
+                // 5. Calculate statistical coefficients (Regression dummy coding)
+                // Base: High Freq (0), L1 (0)
+                const b0 = v_l1h;
+                const b1 = v_l1l - v_l1h;
+                const b2 = v_l2h - v_l1h;
+                const b12 = (v_l2l - v_l2h) - (v_l1l - v_l1h);
+
+                // 6. Update Interaction Logic & Badge
+                const diff_High = v_l1h - v_l2h; // Distance at x1
+                const diff_Low = v_l1l - v_l2l;  // Distance at x2
+                const badge = document.getElementById('interaction-badge');
+
+                if (Math.abs(b12) < 5) {
+                    badge.textContent = "无交互 No Interaction";
+                    badge.className = "badge badge-none";
+                } else if (diff_High * diff_Low < 0) {
+                    // Opposite signs mean lines strictly cross between High and Low Freq
+                    badge.textContent = "零序交互 Disordinal Interaction";
+                    badge.className = "badge badge-disordinal";
+                } else {
+                    // Lines diverge or converge but don't cross strictly inside bounds
+                    badge.textContent = "顺序交互 Ordinal Interaction";
+                    badge.className = "badge badge-ordinal";
+                }
+
+                // 7. Update Panel B Formula
+                document.getElementById('eq-b0').textContent = b0;
+                document.getElementById('eq-b1').textContent = formatBeta(b1);
+                document.getElementById('eq-b2').textContent = formatBeta(b2);
+                document.getElementById('eq-b12').textContent = formatBeta(b12);
+
+                // 8. Update Panel B Stacked Bar
+                const sum = Math.abs(b1) + Math.abs(b2) + Math.abs(b12);
+                const bar1 = document.getElementById('bar-b1');
+                const bar2 = document.getElementById('bar-b2');
+                const bar12 = document.getElementById('bar-b12');
+
+                if (sum === 0) {
+                    bar1.style.width = '33.3%'; bar1.textContent = ''; bar1.style.background = '#ccc';
+                    bar2.style.width = '33.3%'; bar2.textContent = ''; bar2.style.background = '#ccc';
+                    bar12.style.width = '33.4%'; bar12.textContent = ''; bar12.style.background = '#ccc';
+                } else {
+                    const w1 = (Math.abs(b1) / sum) * 100;
+                    const w2 = (Math.abs(b2) / sum) * 100;
+                    const w12 = (Math.abs(b12) / sum) * 100;
+
+                    bar1.style.background = '#009E73';
+                    bar2.style.background = '#0072B2';
+                    bar12.style.background = '#D55E00';
+
+                    bar1.style.width = `${w1}%`;
+                    bar2.style.width = `${w2}%`;
+                    bar12.style.width = `${w12}%`;
+
+                    bar1.textContent = w1 > 12 ? `β₁ (${Math.abs(b1)})` : '';
+                    bar2.textContent = w2 > 12 ? `β₂ (${Math.abs(b2)})` : '';
+                    bar12.textContent = w12 > 12 ? `β₁₂ (${Math.abs(b12)})` : '';
+                }
+            }
+
+            // Event listeners for sliders
+            Object.values(inputs).forEach(input => {
+                input.addEventListener('input', updatePlot);
+            });
+
+            // Set Preset Logic
+            function setPreset(l1h, l1l, l2h, l2l) {
+                inputs.l1_high.value = l1h;
+                inputs.l1_low.value = l1l;
+                inputs.l2_high.value = l2h;
+                inputs.l2_low.value = l2l;
+                updatePlot();
+            }
+
+            // Bind Preset Buttons
+            document.getElementById('btn-preset-1').addEventListener('click', () => setPreset(250, 400, 350, 500)); // Parallel
+            document.getElementById('btn-preset-2').addEventListener('click', () => setPreset(250, 350, 300, 500)); // Ordinal
+            document.getElementById('btn-preset-3').addEventListener('click', () => setPreset(400, 250, 250, 400)); // Disordinal
+            document.getElementById('btn-preset-4').addEventListener('click', () => setPreset(200, 220, 300, 450)); // Real-data
+
+            // Initial draw
+            updatePlot();
+        });
+    </script>
+</body>
+</html>

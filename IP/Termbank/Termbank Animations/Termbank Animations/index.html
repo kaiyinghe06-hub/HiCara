@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>统计术语动画导览 | Termbank Animations Portal</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --blue:   #2c5282;
+    --blue2:  #4a90d9;
+    --green:  #276749;
+    --green2: #48bb78;
+    --gray1:  #f7f8fa;
+    --gray2:  #edf2f7;
+    --gray3:  #cbd5e0;
+    --gray4:  #718096;
+    --dark:   #1a202c;
+    --text:   #2d3748;
+    --radius: 10px;
+    --shadow: 0 2px 12px rgba(0,0,0,0.09);
+  }
+
+  body {
+    font-family: "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", system-ui, Arial, sans-serif;
+    background: var(--gray1);
+    color: var(--text);
+    line-height: 1.6;
+    font-size: 14px;
+  }
+
+  /* ── Header ── */
+  header {
+    background: linear-gradient(135deg, var(--blue) 0%, #553c9a 100%);
+    color: #fff;
+    padding: 2.5rem 2rem 2rem;
+    text-align: center;
+  }
+  header h1 { font-size: 1.75rem; font-weight: 700; letter-spacing: 0.02em; }
+  header .sub {
+    margin-top: .4rem;
+    font-size: .9rem;
+    opacity: .8;
+    font-style: italic;
+  }
+  header .badge {
+    display: inline-block;
+    margin-top: .9rem;
+    background: rgba(255,255,255,.15);
+    border: 1px solid rgba(255,255,255,.3);
+    border-radius: 20px;
+    padding: .25rem .9rem;
+    font-size: .78rem;
+    letter-spacing: .05em;
+  }
+
+  /* ── Layout ── */
+  main { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+  section { margin-bottom: 3rem; }
+  h2 {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--blue);
+    border-left: 4px solid var(--blue);
+    padding-left: .75rem;
+    margin-bottom: 1.2rem;
+  }
+  h3 { font-size: .95rem; color: var(--gray4); font-weight: 600; margin-bottom: .8rem; }
+
+  /* ── Local Animation Cards ── */
+  .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.25rem; }
+  .card {
+    display: block;
+    text-decoration: none;
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1.4rem 1.5rem;
+    border-top: 4px solid var(--blue);
+    transition: transform .18s, box-shadow .18s;
+    color: inherit;
+  }
+  .card:hover { transform: translateY(-3px); box-shadow: 0 6px 22px rgba(0,0,0,0.13); }
+  .card.green  { border-top-color: var(--green2); }
+  .card.orange { border-top-color: #dd6b20; }
+  .card.purple { border-top-color: #805ad5; }
+  .card .card-id { font-size: .7rem; color: var(--gray4); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; }
+  .card .card-zh { font-size: 1.05rem; font-weight: 700; margin: .3rem 0 .15rem; color: var(--dark); }
+  .card .card-en { font-size: .8rem; color: var(--blue2); margin-bottom: .6rem; }
+  .card .card-desc { font-size: .82rem; color: var(--gray4); line-height: 1.5; }
+  .card .card-tag {
+    display: inline-block;
+    margin-top: .8rem;
+    background: var(--green);
+    color: #fff;
+    font-size: .68rem;
+    border-radius: 4px;
+    padding: .15rem .5rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+  }
+
+  /* ── Hub Sites ── */
+  .hubs { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 1rem; }
+  .hub {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    padding: 1rem 1.2rem;
+    border-left: 3px solid var(--blue2);
+  }
+  .hub a { color: var(--blue); font-weight: 700; text-decoration: none; font-size: .88rem; }
+  .hub a:hover { text-decoration: underline; }
+  .hub p { font-size: .78rem; color: var(--gray4); margin-top: .3rem; }
+
+  /* ── Full Term Table ── */
+  .table-wrap { overflow-x: auto; border-radius: var(--radius); box-shadow: var(--shadow); }
+  table { width: 100%; border-collapse: collapse; background: #fff; font-size: .82rem; }
+  thead th {
+    background: var(--blue);
+    color: #fff;
+    padding: .65rem .8rem;
+    text-align: left;
+    white-space: nowrap;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+  thead th:first-child { border-radius: var(--radius) 0 0 0; }
+  thead th:last-child  { border-radius: 0 var(--radius) 0 0; }
+  tbody tr { border-bottom: 1px solid var(--gray2); }
+  tbody tr:hover { background: var(--gray1); }
+  tbody td { padding: .55rem .8rem; vertical-align: top; }
+  td.id-col { font-family: monospace; color: var(--gray4); font-size: .78rem; white-space: nowrap; }
+  td.zh-col { font-weight: 600; color: var(--dark); white-space: nowrap; }
+  td.en-col { color: var(--blue2); white-space: nowrap; }
+  td.stage-col {
+    font-size: .75rem;
+    font-weight: 600;
+    white-space: nowrap;
+    color: var(--gray4);
+  }
+  .stage-a { color: #553c9a; }
+  .stage-b { color: #2b6cb0; }
+  .stage-c { color: #276749; }
+  .stage-d { color: #b7791f; }
+  .stage-e { color: #c53030; }
+
+  td.stars-col { white-space: nowrap; font-size: .88rem; }
+  .s3 { color: #dd6b20; }
+  .s2 { color: #2c5282; }
+  .s1 { color: #718096; }
+
+  td.res-col { min-width: 280px; }
+  .res-list { list-style: none; padding: 0; }
+  .res-list li { margin-bottom: .3rem; }
+  .res-list a { color: var(--blue2); text-decoration: none; font-size: .78rem; }
+  .res-list a:hover { text-decoration: underline; }
+  .badge-local {
+    display: inline-block;
+    background: var(--green);
+    color: #fff;
+    font-size: .65rem;
+    border-radius: 3px;
+    padding: .1rem .35rem;
+    margin-right: .25rem;
+    font-weight: 700;
+  }
+  .badge-web {
+    display: inline-block;
+    background: var(--blue2);
+    color: #fff;
+    font-size: .65rem;
+    border-radius: 3px;
+    padding: .1rem .35rem;
+    margin-right: .25rem;
+    font-weight: 700;
+  }
+
+  /* ── Filter ── */
+  .filter-bar { display: flex; gap: .5rem; flex-wrap: wrap; margin-bottom: 1rem; }
+  .filter-btn {
+    background: var(--gray2);
+    border: 1px solid var(--gray3);
+    border-radius: 20px;
+    padding: .3rem .9rem;
+    font-size: .78rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: background .15s;
+  }
+  .filter-btn:hover, .filter-btn.active { background: var(--blue); color: #fff; border-color: var(--blue); }
+
+  /* ── Footer ── */
+  footer {
+    text-align: center;
+    font-size: .75rem;
+    color: var(--gray4);
+    padding: 1.5rem;
+    border-top: 1px solid var(--gray2);
+    background: #fff;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>统计术语动画导览</h1>
+  <div class="sub">Termbank Animations Portal — 语言学研究统计术语可视化资源</div>
+  <div class="badge">语料库统计术语库 v1.0 · 40 术语 · 4 本地动画 · 10+ 网络资源</div>
+</header>
+
+<main>
+
+<!-- ── Section 1: Local Animations ── -->
+<section>
+  <h2>本地动画 Local Animations</h2>
+  <p style="font-size:.85rem;color:var(--gray4);margin-bottom:1rem;">以下文件与本页位于同一文件夹，点击即可打开，无需网络。</p>
+  <div class="cards">
+
+    <a href="Linear%20Mixed-effects%20Model.html" class="card">
+      <div class="card-id">S37</div>
+      <div class="card-zh">线性混合效应模型</div>
+      <div class="card-en">Linear Mixed-effects Model</div>
+      <div class="card-desc">演示固定效应 vs. 随机效应、随机截距与斜率、偏移收缩（Shrinkage）；词汇判断实验情境。</div>
+      <span class="card-tag">本地 LOCAL</span>
+    </a>
+
+    <a href="Cohen%27s%20Kappa.html" class="card green">
+      <div class="card-id">S18</div>
+      <div class="card-zh">科恩 Kappa 系数</div>
+      <div class="card-en">Cohen's Kappa</div>
+      <div class="card-desc">动画演示列联表构建、偶然一致率计算、Kappa 公式推导；情感标注情境。</div>
+      <span class="card-tag">本地 LOCAL</span>
+    </a>
+
+    <a href="Interaction%20Effect.html" class="card orange">
+      <div class="card-id">S23</div>
+      <div class="card-zh">交互作用</div>
+      <div class="card-en">Interaction Effect</div>
+      <div class="card-desc">2×2 交互图实时拖拽；区分顺序交互与零序交互；词频×语言水平情境。</div>
+      <span class="card-tag">本地 LOCAL</span>
+    </a>
+
+    <a href="BAP.html" class="card purple">
+      <div class="card-id">S27–S29</div>
+      <div class="card-zh">偏倚 · 准确度 · 精密度</div>
+      <div class="card-en">Bias · Accuracy · Precision</div>
+      <div class="card-desc">靶心图动画 + 抽样分布联动；词频估计情境；滑块控制偏倚方向与精密度。</div>
+      <span class="card-tag">本地 LOCAL</span>
+    </a>
+
+  </div>
+</section>
+
+<!-- ── Section 2: Hub Sites ── -->
+<section>
+  <h2>推荐网络资源枢纽 Key Online Hubs</h2>
+  <div class="hubs">
+    <div class="hub">
+      <a href="https://rpsychologist.com/viz/" target="_blank">R Psychologist · rpsychologist.com/viz/</a>
+      <p>行为/语言科学语境，D3.js 交互；覆盖效应量、功效、相关、贝叶斯。CC0 授权。</p>
+    </div>
+    <div class="hub">
+      <a href="https://seeing-theory.brown.edu/" target="_blank">Seeing Theory · seeing-theory.brown.edu</a>
+      <p>Brown 大学，D3.js 动画；概率分布、频率推断、Bootstrap、回归、贝叶斯。</p>
+    </div>
+    <div class="hub">
+      <a href="https://artofstat.com/web-apps" target="_blank">ArtofStat · artofstat.com/web-apps</a>
+      <p>浏览器内运行；Bootstrap 分布、置信区间、回归、功效分析，步骤动画。</p>
+    </div>
+    <div class="hub">
+      <a href="https://www.geogebra.org/math/statistics-probability" target="_blank">GeoGebra · geogebra.org</a>
+      <p>海量可嵌入 applet；正态分布、回归、相关；可独立嵌入 iframe。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ── Section 3: Full Term Table ── -->
+<section>
+  <h2>术语总览与演示资源 All Terms &amp; Demo Resources</h2>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterTable('all')">全部 All</button>
+    <button class="filter-btn" onclick="filterTable('★★★')">★★★ 强烈推荐</button>
+    <button class="filter-btn" onclick="filterTable('local')">📁 本地动画</button>
+    <button class="filter-btn" onclick="filterTable('E')">E 统计建模</button>
+    <button class="filter-btn" onclick="filterTable('A')">A 明确目标</button>
+  </div>
+
+  <div class="table-wrap">
+  <table id="term-table">
+    <thead>
+      <tr>
+        <th>编号</th>
+        <th>中文名称</th>
+        <th>英文名称</th>
+        <th>阶段</th>
+        <th>演示适合度</th>
+        <th>演示资源（网络 + 本地）</th>
+      </tr>
+    </thead>
+    <tbody id="term-tbody">
+    </tbody>
+  </table>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  语料库统计术语动画导览 v1.0 &nbsp;|&nbsp; 2026-04 &nbsp;|&nbsp; 语言学研究用途 &nbsp;|&nbsp;
+  相对路径，可移动文件夹，离线可用
+</footer>
+
+<script>
+const TERMS = [
+  {id:"S01",zh:"总体",en:"Population",           stage:"A",stars:"★",    res:[]},
+  {id:"S02",zh:"有限总体",en:"Finite Population", stage:"A",stars:"★",    res:[]},
+  {id:"S03",zh:"随机变量",en:"Random Variable",   stage:"A",stars:"★★",
+    res:[{type:"web",label:"Seeing Theory 概率分布",url:"https://seeing-theory.brown.edu/probability-distributions/"}]},
+  {id:"S04",zh:"概率分布",en:"Probability Distribution",stage:"A",stars:"★★★",
+    res:[{type:"web",label:"Seeing Theory 分布族",url:"https://seeing-theory.brown.edu/probability-distributions/"}]},
+  {id:"S05",zh:"正态分布",en:"Normal Distribution",stage:"A",stars:"★★★",
+    res:[
+      {type:"web",label:"IntMath 正态分布（滑块）",url:"https://www.intmath.com/counting-probability/normal-distribution-graph-interactive.php"},
+      {type:"web",label:"Academo 高斯分布",url:"https://academo.org/demos/gaussian-distribution/"},
+      {type:"web",label:"GeoGebra 正态曲线",url:"https://www.geogebra.org/m/FkM9xWNH"}
+    ]},
+  {id:"S06",zh:"参数",en:"Parameter",             stage:"A",stars:"★",    res:[]},
+  {id:"S07",zh:"期望",en:"Expectation",           stage:"A",stars:"★★",
+    res:[{type:"web",label:"Seeing Theory（期望模块）",url:"https://seeing-theory.brown.edu/basic-probability/"}]},
+  {id:"S08",zh:"方差",en:"Variance",              stage:"A",stars:"★★",
+    res:[{type:"web",label:"ArtofStat 分布与方差",url:"https://artofstat.com/web-apps"}]},
+  {id:"S09",zh:"抽样框",en:"Sampling Frame",      stage:"B",stars:"—",    res:[]},
+  {id:"S10",zh:"抽样设计",en:"Sampling Design",   stage:"B",stars:"★",    res:[]},
+  {id:"S11",zh:"统计功效",en:"Statistical Power", stage:"B",stars:"★★★",
+    res:[{type:"web",label:"R Psychologist NHST（功效/α/β）",url:"https://rpsychologist.com/d3/nhst/"}]},
+  {id:"S12",zh:"整群抽样",en:"Cluster Sampling",  stage:"B",stars:"★★",   res:[]},
+  {id:"S13",zh:"样本",en:"Sample",                stage:"B",stars:"★★",
+    res:[{type:"web",label:"Seeing Theory 频率推断",url:"https://seeing-theory.brown.edu/frequentist-inference/"}]},
+  {id:"S14",zh:"实验",en:"Experiment",            stage:"B",stars:"★",    res:[]},
+  {id:"S15",zh:"因子",en:"Factor",                stage:"B",stars:"★",    res:[]},
+  {id:"S16",zh:"标注者间一致性",en:"Inter-annotator Agreement",stage:"B",stars:"★★",res:[]},
+  {id:"S17",zh:"实验处理",en:"Experimental Treatment",stage:"C",stars:"★",res:[]},
+  {id:"S18",zh:"科恩 Kappa 系数",en:"Cohen's Kappa",stage:"C",stars:"★★★",
+    res:[
+      {type:"local",label:"Cohen's Kappa.html",url:"Cohen%27s%20Kappa.html"},
+      {type:"web",label:"GraphPad Kappa 计算器",url:"https://www.graphpad.com/quickcalcs/kappa1/"}
+    ]},
+  {id:"S19",zh:"克里彭多夫 Alpha",en:"Krippendorff's Alpha",stage:"C",stars:"★★",res:[]},
+  {id:"S20",zh:"重复",en:"Replication",           stage:"C",stars:"★★",
+    res:[{type:"web",label:"ArtofStat Bootstrap",url:"https://artofstat.com/web-apps"}]},
+  {id:"S21",zh:"区组化",en:"Blocking",            stage:"C",stars:"★",    res:[]},
+  {id:"S22",zh:"响应变量",en:"Response Variable", stage:"C",stars:"★",    res:[]},
+  {id:"S23",zh:"交互作用",en:"Interaction Effect",stage:"C",stars:"★★★",
+    res:[{type:"local",label:"Interaction Effect.html",url:"Interaction%20Effect.html"}]},
+  {id:"S24",zh:"抽样误差",en:"Sampling Error",    stage:"C",stars:"★★",
+    res:[{type:"web",label:"Seeing Theory 频率推断",url:"https://seeing-theory.brown.edu/frequentist-inference/"}]},
+  {id:"S25",zh:"标准差",en:"Standard Deviation",  stage:"D",stars:"★★",
+    res:[{type:"web",label:"ArtofStat 标准差探索",url:"https://artofstat.com/web-apps"}]},
+  {id:"S26",zh:"估计量",en:"Estimator",           stage:"D",stars:"★★",   res:[]},
+  {id:"S27",zh:"偏倚",en:"Bias",                  stage:"D",stars:"★★★",
+    res:[{type:"local",label:"BAP.html（偏倚·准确度·精密度）",url:"BAP.html"}]},
+  {id:"S28",zh:"准确度",en:"Accuracy",            stage:"D",stars:"★★★",
+    res:[{type:"local",label:"BAP.html（偏倚·准确度·精密度）",url:"BAP.html"}]},
+  {id:"S29",zh:"精密度",en:"Precision",           stage:"D",stars:"★★★",
+    res:[{type:"local",label:"BAP.html（偏倚·准确度·精密度）",url:"BAP.html"}]},
+  {id:"S30",zh:"效应量",en:"Effect Size",         stage:"D",stars:"★★★",
+    res:[{type:"web",label:"R Psychologist Cohen's d",url:"https://rpsychologist.com/cohend/"}]},
+  {id:"S31",zh:"重复测量方差分析",en:"Repeated-measures ANOVA",stage:"D",stars:"★★",res:[]},
+  {id:"S32",zh:"回归分析",en:"Regression Analysis",stage:"D",stars:"★★★",
+    res:[
+      {type:"web",label:"Seeing Theory OLS",url:"https://seeing-theory.brown.edu/regression-analysis/"},
+      {type:"web",label:"ArtofStat 回归",url:"https://artofstat.com/web-apps"}
+    ]},
+  {id:"S33",zh:"皮尔逊相关",en:"Pearson Correlation",stage:"E",stars:"★★★",
+    res:[
+      {type:"web",label:"R Psychologist 相关可视化",url:"https://rpsychologist.com/correlation/"},
+      {type:"web",label:"ArtofStat 相关与散点图",url:"https://artofstat.com/web-apps"}
+    ]},
+  {id:"S34",zh:"斯皮尔曼相关",en:"Spearman Correlation",stage:"E",stars:"★★★",
+    res:[{type:"web",label:"R Psychologist（含秩转换）",url:"https://rpsychologist.com/correlation/"}]},
+  {id:"S35",zh:"线性回归",en:"Linear Regression",  stage:"E",stars:"★★★",
+    res:[
+      {type:"web",label:"Seeing Theory 线性回归",url:"https://seeing-theory.brown.edu/regression-analysis/"},
+      {type:"web",label:"Observable 拖拽点回归",url:"https://observablehq.com/@yizhe-ang/interactive-visualization-of-linear-regression"}
+    ]},
+  {id:"S36",zh:"逻辑回归",en:"Logistic Regression",stage:"E",stars:"★★★",
+    res:[
+      {type:"web",label:"John Della Rosa Logistic App",url:"https://johndellarosa.github.io/projects/distribution-book/logistic-regression-app"},
+      {type:"web",label:"Desmos 逻辑斯谛曲线",url:"https://www.desmos.com/calculator/naf1qogfjn"}
+    ]},
+  {id:"S37",zh:"线性混合效应模型",en:"Linear Mixed-effects Model",stage:"E",stars:"★★★",
+    res:[{type:"local",label:"Linear Mixed-effects Model.html",url:"Linear%20Mixed-effects%20Model.html"}]},
+  {id:"S38",zh:"广义线性混合模型",en:"Generalized Linear Mixed Model",stage:"E",stars:"★★",res:[]},
+  {id:"S39",zh:"自助法",en:"Bootstrap",           stage:"E",stars:"★★★",
+    res:[
+      {type:"web",label:"Seeing Theory Bootstrap 动画",url:"https://seeing-theory.brown.edu/frequentist-inference/"},
+      {type:"web",label:"ArtofStat Bootstrap 步骤动画",url:"https://artofstat.com/web-apps"}
+    ]},
+  {id:"S40",zh:"贝叶斯推断",en:"Bayesian Inference",stage:"E",stars:"★★★",
+    res:[
+      {type:"web",label:"R Psychologist 贝叶斯",url:"https://rpsychologist.com/d3/bayes/"},
+      {type:"web",label:"Seeing Theory 贝叶斯推断",url:"https://seeing-theory.brown.edu/bayesian-inference/"}
+    ]},
+];
+
+const STAGE_LABELS = {A:"A 明确目标",B:"B 设计方案",C:"C 实施采集",D:"D 分析推断",E:"E 统计建模"};
+
+function renderTable(data) {
+  const tbody = document.getElementById("term-tbody");
+  tbody.innerHTML = "";
+  data.forEach(t => {
+    const tr = document.createElement("tr");
+    tr.dataset.stage = t.stage;
+    tr.dataset.stars = t.stars;
+    tr.dataset.hasLocal = t.res.some(r => r.type === "local") ? "1" : "0";
+
+    const resHtml = t.res.length === 0
+      ? '<span style="color:var(--gray3)">—</span>'
+      : `<ul class="res-list">${t.res.map(r =>
+          r.type === "local"
+            ? `<li><span class="badge-local">本地</span><a href="${r.url}">${r.label}</a></li>`
+            : `<li><span class="badge-web">网络</span><a href="${r.url}" target="_blank">${r.label}</a></li>`
+        ).join("")}</ul>`;
+
+    const starsClass = t.stars === "★★★" ? "s3" : t.stars === "★★" ? "s2" : t.stars === "★" ? "s1" : "";
+
+    tr.innerHTML = `
+      <td class="id-col">${t.id}</td>
+      <td class="zh-col">${t.zh}</td>
+      <td class="en-col">${t.en}</td>
+      <td class="stage-col stage-${t.stage.toLowerCase()}">${STAGE_LABELS[t.stage]}</td>
+      <td class="stars-col ${starsClass}">${t.stars}</td>
+      <td class="res-col">${resHtml}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+function filterTable(filter) {
+  document.querySelectorAll(".filter-btn").forEach(b => b.classList.remove("active"));
+  event.target.classList.add("active");
+  let filtered;
+  if (filter === "all")    filtered = TERMS;
+  else if (filter === "★★★") filtered = TERMS.filter(t => t.stars === "★★★");
+  else if (filter === "local") filtered = TERMS.filter(t => t.res.some(r => r.type === "local"));
+  else filtered = TERMS.filter(t => t.stage === filter);
+  renderTable(filtered);
+}
+
+renderTable(TERMS);
+</script>
+</body>
+</html>
